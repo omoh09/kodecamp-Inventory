@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Product;
 
 class ProductController extends Controller
 {
@@ -15,18 +16,17 @@ class ProductController extends Controller
     public function index()
     {
         try{
-
-            $data = ProductResource::collection(Product::all());
+            //$data = ProductResource::collection(Product::all());
+            $data = Product::all();
 
             return response()->json([
                 'message' => 'success!',
                 'data' => $data
             ], 200);
-
         } catch (Exception $e) {
                 return $e->getMessage();
-            }
         }
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -47,16 +47,15 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:product|max:255',
-            'ItemNumber' => 'required|int',
+            'name' => 'required|unique:products|max:255',
             'price' => 'required|int',
             'quantity' => 'required|int',
             'description' => 'required',
         ]);
-
-        $project = Product::create([
+        
+        $product = Product::create([
             'name' => $request->name,
-            'ItemNumber' => $request->ItemNumber,
+            'ItemNumber' => $this->quickRandom(),
             'price' => $request->price,
             'quantity' => $request->quantity,
             'description' => $request->description
@@ -66,8 +65,8 @@ class ProductController extends Controller
             $files = $request->file('pictures');
             $url  = cloudinary()->upload($files->getRealPath(),['folder' => 'leo'])->getSecurePath();
             if($url){
-                $file = $project->files()->create([
-                    'project_id' => $project->id,
+                $file = $product->files()->create([
+                    'project_id' => $product->id,
                     'url' => $url
                 ]);
             }
@@ -75,7 +74,7 @@ class ProductController extends Controller
         
         return response()->json([
             'message' => 'success',
-            'data' => $project
+            'data' => $product
         ]);      
     }
 
@@ -153,5 +152,12 @@ class ProductController extends Controller
         return response()->json([
             'message' => 'successfully deleted'
         ], 200);
+    }
+
+    protected function quickRandom($length = 9)
+    {
+        $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
     }
 }

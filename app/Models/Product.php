@@ -11,6 +11,8 @@ class Product extends Model
     use HasFactory;
     //use MediaAlly;
 
+    //protected $table = 'products';
+
     protected $fillable = [
         'name',
         'ItemNumber',

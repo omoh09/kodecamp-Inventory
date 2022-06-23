@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('price');
-            $table->integer('ItemNumber');
+            $table->string('ItemNumber');
             $table->integer('quantity')->default(0);
             $table->longText('description')->nullable();
             $table->timestamps();
